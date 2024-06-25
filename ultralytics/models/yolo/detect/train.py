@@ -12,7 +12,7 @@ from ultralytics.engine.trainer import BaseTrainer
 from ultralytics.models import yolo
 from ultralytics.nn.tasks import DetectionModel
 from ultralytics.utils import LOGGER, RANK
-from ultralytics.utils.plotting import plot_images, plot_labels, plot_results
+from ultralytics.utils.plotting import plot_images, plot_labels, plot_results, output_to_target
 from ultralytics.utils.torch_utils import de_parallel, torch_distributed_zero_first
 
 
@@ -129,6 +129,17 @@ class DetectionTrainer(BaseTrainer):
             bboxes=batch["bboxes"],
             paths=batch["im_file"],
             fname=self.save_dir / f"train_batch{ni}.jpg",
+            on_plot=self.on_plot,
+        )
+    
+    def plot_predictions(self, batch, preds, ni):
+        """Plots predicted bounding boxes on input images and saves the result."""
+        plot_images(
+            batch["img"],
+            *output_to_target(preds, max_det=self.args.max_det),
+            paths=batch["im_file"],
+            fname=self.save_dir / f"val_batch{ni}_pred.jpg",
+            names=self.names,
             on_plot=self.on_plot,
         )
 

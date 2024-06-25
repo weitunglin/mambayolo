@@ -21,6 +21,9 @@ def parse_opt():
     parser.add_argument('--name', default='mambayolo', help='save to project/name')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
+    parser.add_argument('--plots', action='store_true', help='whether plots the results')
+    parser.add_argument('--save_frames', action='store_true', help='whether saves result frames')
+
     opt = parser.parse_args()
     return opt
 
@@ -38,11 +41,11 @@ if __name__ == '__main__':
         "amp": opt.amp,
         "project": ROOT + opt.project,
         "name": opt.name,
+        "plots": opt.plots,
+        "save_frames": opt.save_frames,
     }
     model_conf = ROOT + opt.config
-    task_type = {
-        "train": YOLO(model_conf).train(**args),
-        "val": YOLO(model_conf).val(**args),
-        "test": YOLO(model_conf).test(**args),
-    }
-    task_type.get(task)
+    if task == 'train':
+        YOLO(model_conf).train(**args)
+    elif task == 'val':
+        YOLO(model_conf).val(**args)
